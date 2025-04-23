@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>Solve Your USOWAN</title>
+        <audio src="musica/gavotaBach.mp3" autoplay loop></audio>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1">
+        <link rel="shotcut icon" href="imagenes/cabecera.jpg" type="image/jpg">
+        <link rel="stylesheet" href="css/principal.css">
+        <link rel="stylesheet" href="css/fontello.css">
+    </head>
+    
+    <body>
+        <header class="header">
+            <div class="contenedor">
+                <h1>Solve Your USOWAN</h1>
+            </div>
+        </header>
+        
+        <main>
+
+            <section id="titulo">
+                <h2>USOWAN</h2>
+            </section>
+           
+           <section id="bienvenida">
+               <p> ¿Estás tratando de resolver tu puzzle de USOWAN y quieres comprobar que lo has resuelto bien?</p> 
+               <br>
+               <p>No lo dudes y empieza ya con la resolución.</p>
+               <br>
+               <a href="#" class="boton" onclick="abrirCamara()">Comienza ya</a>
+               <div id="contenedorCamara" style="display: none;">
+                    <video id="video" autoplay playsinline></video>
+                    <br>
+                    <button class="boton" onclick="capturarFoto()">Capturar Foto</button>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <img id="foto" alt="Foto capturada" style="margin-top: 10px; max-width: 100%;">
+               </div>
+               <p>¿Tienes ya la foto?</p>
+               <a href="#" class="boton" onclick="redirigirConRetardo(event)">Resuélvelo</a>
+               <p id="mensaje-redirect" style="display: none; margin-top: 10px;">Resolviendo tu problema, espere unos segundos</p>
+
+               <a href="#" class="boton" onclick="conectarServidor()">PRUEBA</a>
+                       <p>Probando a llamar a un servidor</p>
+
+             
+           </section>
+
+           
+
+        </main>
+
+        <script>
+            async function conectarServidor() {
+                try {
+                    // Mostrar un mensaje mientras se conecta
+                    document.getElementById("mensaje-redirect").style.display = "block";
+                    document.getElementById("mensaje-redirect").innerText = "Conectando al servidor...";
+        
+                    const respuesta = await fetch('https://tu-servidor.com/api/endpoint', {
+                        method: 'POST', // o 'GET' si es solo consulta
+                        headers: {
+                            'Content-Type': 'application/json'
+                            // Agrega aquí cabeceras extra si son necesarias (ej: autenticación)
+                        },
+                        body: JSON.stringify({
+                            mensaje: "Usuario quiere resolver el puzzle"
+                            // Puedes enviar más datos si lo necesitas
+                        })
+                    });
+        
+                    if (!respuesta.ok) throw new Error('Error en la conexión con el servidor');
+        
+                    const datos = await respuesta.json();
+                    console.log("Respuesta del servidor:", datos);
+        
+                    // Actualiza el mensaje y redirige
+                    document.getElementById("mensaje-redirect").innerText = "¡Conexión exitosa! Redirigiendo...";
+        
+                    setTimeout(() => {
+                        window.location.href = "solucion.html";
+                    }, 3000);
+        
+                } catch (error) {
+                    document.getElementById("mensaje-redirect").innerText = "Error al conectar con el servidor: " + error.message;
+                    console.error("Error:", error);
+                }
+            }
+        </script>
+        
+
+        <script>
+            function abrirCamara() {
+                const contenedor = document.getElementById('contenedorCamara');
+                const video = document.getElementById('video');
+        
+                contenedor.style.display = 'block';
+        
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function(error) {
+                        alert('No se pudo acceder a la cámara: ' + error);
+                    });
+            }
+        
+            function capturarFoto() {
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const foto = document.getElementById('foto');
+        
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+        
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+                foto.src = canvas.toDataURL('image/png');
+            }
+            function redirigirConRetardo(event) {
+                event.preventDefault(); 
+
+                document.getElementById("mensaje-redirect").style.display = "block";
+
+                setTimeout(function() {
+                    window.location.href = "escaneo.html";
+                }, 5000);
+            }
+        </script>
+        
+    </body>
+</html>
